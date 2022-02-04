@@ -2,16 +2,25 @@
 <html>
     <textarea id='inputmml' value='test용' class="text"></textarea>
     <button id="button" type="button" onclick='change()'>바꾸기</button><br> 
-    
     <textarea id='outputmml' class="text"></textarea><br>
-    <p>     수식</p>
+    <p>   수식    
+      <select name="example">
+        <option value=''>예시없음</option>
+        <option value='<math xmlns="http://www.w3.org/1998/Math/MathML"><mfenced open="|" close="|"><mfrac><mn>1</mn><mn>2</mn></mfrac></mfenced><mo>=</mo><mfenced open="|" close="|"><mrow><mo>-</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></mfenced></math>'>예시1</option>
+        <option value='<math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mo>(</mo><mn>31</mn><mo>.</mo><mn>65</mn><msup><mo>)</mo><mn>5</mn></msup></math>'>예시2</option>
+        <option value='<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>A</mi><mo>&#x2283;</mo><mfenced><mrow><mi>A</mi><mo>-</mo><mi>B</mi></mrow></mfenced></math>'>예시3</option>
+        <option value='<math xmlns="http://www.w3.org/1998/Math/MathML"><mmultiscripts><mi>P</mi><mi>r</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts><mo>=</mo><mfrac><mrow><mi>n</mi><mo>!</mo></mrow><mrow><mfenced><mrow><mi>n</mi><mo>-</mo><mi>r</mi></mrow></mfenced><mo>!</mo></mrow></mfrac></math>'>예시4</option>
+        <option value='<math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>g</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mo>:</mo><mi>X</mi><mo>&#x2192;</mo><mi>Y</mi></math>'>예시5</option>
+      </select>
+    </p>
+    
     <p id='output_mathjax' aria-label></p>
+    
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
         <script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
         <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        
         <title>Korea Mathspeak Tensor tests.</title>
         <script async>
             var SREfeature = {
@@ -19,7 +28,7 @@
                 //for Vscode Live Server
                 //let file = 'http://localhost:5500/lib/mathmaps/' + loc + '.json';
                 //for github Server
-                let file = 'https://dcheol.github.io/sre_ko_demosite/lib/mathmaps/' + loc + '.json';
+                 let file = 'https://dcheol.github.io/sre_ko_demosite/lib/mathmaps/' + loc + '.json';
                 let httpRequest = new XMLHttpRequest();
                 return new Promise((res, rej) => {
                   httpRequest.onreadystatechange = function() {
@@ -44,25 +53,29 @@
         <script src='./lib/sre.js' async></script>
 
         <script>
-          var input = document.getElementById('inputmml')       //input text area
+          var input = document.getElementById('inputmml')         //input textarea
           var output = document.getElementById('output_mathjax'); //output mathjax
           var button = document.getElementById('button');
+          var outputtext = document.getElementById('outputmml');  //output textarea
 
           const change = function(){
               var dom = $('input[name="DOMAIN"]:checked').val();
               var loc = $('input[name="LOCALE"]:checked').val();
+              var exm = $("select[name='example']").val()
               
               SRE.setupEngine({
                 'domain' : dom,
                 'locale': loc
               });
               
-              //setting output textarea
-              const mml = SRE.toSpeech(input.value);
-              document.getElementById('outputmml').value = mml; //outnput text area
+              /*setting output textarea*/
+              var inputstring = exm===''? input.value : exm
+              const mml = SRE.toSpeech(inputstring);
+              outputtext.value = mml; //output text area
               
+              /*draw mathjax-container*/
               button.disabled = true;
-              output.innerHTML = input.value.trim();
+              output.innerHTML = inputstring.trim();
               // MathJax.texReset();
               // MathJax.typesetClear();
               MathJax.typesetPromise([output]).catch(function(err) {
@@ -72,8 +85,8 @@
               }).then(function() {
                 button.disabled = false;
               });
-              // document.getElementById('output_mathjax').innerHTML = inputtext;
               
+              /*set aria-label*/
               document.getElementById('output_mathjax').setAttribute('aria-label', mml);
           }
         </script>
