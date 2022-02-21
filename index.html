@@ -61,16 +61,19 @@
           const change = function(){
               var dom = $('input[name="DOMAIN"]:checked').val();
               var loc = $('input[name="LOCALE"]:checked').val();
-              var exm = $("select[name='example']").val()
-              
-              SRE.setupEngine({
-                'domain' : dom,
-                'locale': loc
-              });
+              var exm = $("select[name='example']").val();
               
               /*setting output textarea*/
-              var inputstring = exm===''? input.value : exm
-              const mml = SRE.toSpeech(inputstring);
+              var inputstring = exm===''? input.value : exm;
+              var mml;
+
+              new Promise(function(resolve, reject) {
+                SRE.setupEngine({
+                  'domain' : dom,
+                  'locale': loc
+                });
+              }).then(mml = SRE.toSpeech(inputstring))
+              
               outputtext.value = mml; //output text area
               
               /*draw mathjax-container*/
